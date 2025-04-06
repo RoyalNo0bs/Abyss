@@ -224,8 +224,16 @@ do
 			SetNetworkOwnerRemote:FireServer(Player.Character:WaitForChild("Torso"),Player.Character:WaitForChild("Torso").CFrame)
 			plr.Character:WaitForChild("HumanoidRootPart").AssemblyLinearVelocity = Vector3.new(0,0,0)
 			wait(0.05)
-			Player.Character:WaitForChild("Torso").CFrame = CFrame.new(Vector3.new(-30.475, 63.9, 1.45))
-
+			plr.Character:WaitForChild("HumanoidRootPart").CFrame = Player.Character:WaitForChild("Torso").CFrame
+			plr.Character:WaitForChild("HumanoidRootPart").AssemblyLinearVelocity = Vector3.new(0,0,0)
+			wait(0.1)
+			SetNetworkOwnerRemote:FireServer(Player.Character:WaitForChild("Torso"),Player.Character:WaitForChild("Torso").CFrame)
+			wait(0.05)plr.Character:WaitForChild("HumanoidRootPart").CFrame = Player.Character:WaitForChild("Torso").CFrame
+			plr.Character:WaitForChild("HumanoidRootPart").AssemblyLinearVelocity = Vector3.new(0,0,0)
+			wait(0.1)
+			SetNetworkOwnerRemote:FireServer(Player.Character:WaitForChild("Torso"),Player.Character:WaitForChild("Torso").CFrame)
+			plr.Character:WaitForChild("HumanoidRootPart").AssemblyLinearVelocity = Vector3.new(0,0,0)
+			wait(0.05)
 			plr.Character:WaitForChild("HumanoidRootPart").CFrame = Player.Character:WaitForChild("Torso").CFrame
 			plr.Character:WaitForChild("HumanoidRootPart").AssemblyLinearVelocity = Vector3.new(0,0,0)
 			wait(0.1)
