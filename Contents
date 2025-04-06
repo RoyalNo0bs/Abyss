@@ -176,7 +176,7 @@ do
 		Title = "Time",
 		Description = "The seconds it lasts for",
 		Default = 3,
-		Min = 3,
+		Min = 0,
 		Max = 15,
 		Rounding = 1
 	})
