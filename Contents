@@ -279,7 +279,7 @@ do
 					
 				end
 			end
-			wait(5)
+			wait(Options.Time.Value)
 			plr.Character:WaitForChild("HumanoidRootPart").CFrame = CFrame.new(Vector3.new(77.476, -7.813, 47.892))
 			plr.Character:WaitForChild("HumanoidRootPart").AssemblyLinearVelocity = Vector3.new(0,0,0)
 			for _, Box in ipairs(workspace:GetDescendants()) do
