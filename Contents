@@ -175,7 +175,7 @@ do
 	local Time = Tabs.DirectionalPunch:AddSlider("Time", {
 		Title = "Time",
 		Description = "The seconds it lasts for",
-		Default = 3,
+		Default = 0,
 		Min = 0,
 		Max = 15,
 		Rounding = 1
