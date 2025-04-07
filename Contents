@@ -157,7 +157,7 @@ do
 			humanoidRootPart.CFrame = humanoidRootPart.CFrame + offset
 		end
 	end)
-	
+
 	WalkSpeed:OnChanged(function(Bool)
 		movementDirection = Vector3.zero
 	end)
@@ -182,9 +182,9 @@ do
 		Max = 15,
 		Rounding = 1
 	})
-	
-	
-	
+
+
+
 	local PlayerSelected = Tabs.DirectionalPunch:AddInput("PlayerSelected", {
 		Title = "Player",
 		Default = "",
@@ -195,13 +195,13 @@ do
 			print("Input changed:", Value)
 		end
 	})
-	
+
 	PlayerSelected:OnChanged(function(Value)
 		if game.Players:FindFirstChild(Value) then
 			Selected = game.Players:FindFirstChild(Value)
 		end
 	end)
-	
+
 
 	Tabs.DirectionalPunch:AddButton({
 		Title = "Start",
@@ -228,11 +228,88 @@ do
 		end
 	})
 
+	local FinalRipOff = Tabs.DirectionalPunch:AddParagraph({
+		Title = "Final Rip-Off",
+		Content = ""
+	})
+
+
+	local QToActivate= Tabs.DirectionalPunch:AddToggle("QToActivate", {Title = "Q To Activate", Default = false })
+
+	plr:GetMouse().KeyDown:Connect(function(key)
+		if key == "q" then
+			if Options.QToActivate.Value == true then
+				FinalRipOff_Move()
+			end
+		end
+	end)
+
+	function FinalRipOff_Move()
+
+		local params = RaycastParams.new()
+		params.FilterType = Enum.RaycastFilterType.Exclude
+		params.FilterDescendantsInstances = {plr.Character,plr.Character:FindFirstChild("Head"),workspace.CurrentCamera}
+		local ray = workspace:Raycast(workspace.CurrentCamera.CFrame.Position,workspace.CurrentCamera.CFrame.LookVector*50,params)
+
+		if ray and ray.Instance and ray.Instance.Parent and ray.Instance.Parent:FindFirstChild("Humanoid") and ray.Instance.Parent.Name ~= plr.Name then
+			print(ray.Instance.Name)
+			local Character = ray.Instance.Parent
+			local Torso = Character:WaitForChild("Torso")
+			local HRP = plr.Character:WaitForChild("HumanoidRootPart")
+			local StartingPoint = HRP.Position
+			local MiddlePoint = Vector3.new(HRP.Position.X,HRP.Position.Y+ 100,HRP.Position.Z) + HRP.CFrame.LookVector * 7
+			local LastPoint = HRP.Position + HRP.CFrame.LookVector * 60
+
+			HRP.CFrame = Torso.CFrame
+			wait(0.05)
+			SetNetworkOwnerRemote:FireServer(Torso,Torso.CFrame)
+			wait(0.1)
+			HRP.CFrame = Torso.CFrame
+			wait(0.05)
+			SetNetworkOwnerRemote:FireServer(Torso,Torso.CFrame)
+			wait(0.1)
+			HRP.CFrame = Torso.CFrame
+			wait(0.05)
+			SetNetworkOwnerRemote:FireServer(Torso,Torso.CFrame)
+			wait(0.1)
+			
+			local BodyPosition = Instance.new("BodyPosition")
+			BodyPosition.P = 200000000
+			BodyPosition.MaxForce = Vector3.new(999999999,999999999,999999999)
+			BodyPosition.Position = StartingPoint
+			BodyPosition.Parent = Torso
+			
+			local BodyPosition2 = Instance.new("BodyPosition")
+			BodyPosition2.P = 200000
+			BodyPosition2.MaxForce = Vector3.new(99999,99999,99999)
+			BodyPosition2.Position = StartingPoint
+			BodyPosition2.Parent = HRP
+			
+			wait(.5)
+			BodyPosition.Position = MiddlePoint
+			BodyPosition2.Position = MiddlePoint + Vector3.new(0,8,0)
+			wait(1)
+			BodyPosition.Position = LastPoint
+			BodyPosition2.Position = LastPoint
+			wait(1)
+			BodyPosition2:Destroy()
+			BodyPosition:Destroy()
+			
+			for _, SmallDice in ipairs(workspace:GetDescendants()) do
+				if SmallDice.Name == "DiceSmall" and SmallDice:IsA("Model") then
+					SmallDice.PrimaryPart.CFrame = Torso.CFrame
+				end
+			end
+			Character.Humanoid.Health -= 50
+
+		end
+	end
+
 	function Start_DirectionPunch_Event()
 		if Selected then
 			local Player = Selected
 			local Character = workspace
-			
+
 			if Player:FindFirstChild("InPlot") and Player.Character then
 				Character = Player.Character
 				if Player:FindFirstChild("InPlot").Value == true then
@@ -241,29 +318,29 @@ do
 			else
 				Character = Selected
 			end
-			
+
 			local HumanoidRootPart = Character:WaitForChild("HumanoidRootPart")
-			
+
 			local Humanoid = Character:WaitForChild("Humanoid")
 			local Torso = Character:WaitForChild("Torso")
-			
+
 			local OriginalCframe = plr.Character:WaitForChild("HumanoidRootPart").CFrame
 			local chr = plr.Character
 			local HRP = chr:WaitForChild("HumanoidRootPart")
-			
+
 			for _, BodyForce in ipairs(Character:GetDescendants()) do
 				if BodyForce:IsA("BodyPosition") or BodyForce:IsA("BodyForce") then
 					BodyForce:Destroy()
 					HumanoidRootPart.AssemblyLinearVelocity = Vector3.new(0,0,0)
 				end
 			end		
-			
+
 			local CamaPart = Instance.new("Part")
 			CamaPart.Parent = workspace
 			CamaPart.Anchored = true
 			CamaPart.Position = Vector3.new(-30.475, 205.2, 29.55)
 			workspace.CurrentCamera.CameraSubject = CamaPart
-			
+
 			HRP.AssemblyLinearVelocity = Vector3.new(0,0,0)
 			HRP.CFrame = HumanoidRootPart.CFrame
 			wait(0.1)
@@ -284,7 +361,7 @@ do
 			wait(0.1)
 			SetNetworkOwnerRemote:FireServer(Torso,Torso.CFrame)
 			wait(0.05)
-			
+
 			local PreventEscape = Humanoid.StateChanged:Connect(function()
 				if Humanoid:GetState() ~= Enum.HumanoidStateType.Seated then
 					HRP.AssemblyLinearVelocity = Vector3.new(0,0,0)
@@ -305,17 +382,17 @@ do
 					HRP.CFrame = OriginalCframe
 				end
 			end)
-			
+
 			HumanoidRootPart.CFrame = CFrame.new(Vector3.new(-30.475, 191.4, 1.45))
 			local BodyPosition = Instance.new("BodyPosition")
 			BodyPosition.Position = Vector3.new(-30.475, 191.4, 1.45)
 			BodyPosition.P = 100000
 			BodyPosition.Parent = HumanoidRootPart
 			BodyPosition.MaxForce = Vector3.new(10000,10000,10000)
-			
+
 			for _, DrawerLightBrown in ipairs(workspace:GetDescendants()) do
 				if DrawerLightBrown:IsA("Model") and DrawerLightBrown.Name == "DrawerLightBrown" and DrawerLightBrown.PrimaryPart then
-					
+
 					local function GeneratePosition(center, radius)
 						local theta = math.rad(math.random(0, 360)) -- Random angle around the horizontal axis
 						local phi = math.rad(math.random(0, 180)) -- Random angle from the vertical axis
@@ -325,17 +402,17 @@ do
 
 						return center.Position + Vector3.new(x, y, z)
 					end
-					
+
 					if DrawerLightBrown.PrimaryPart:FindFirstChildOfClass("BodyPosition") then
 						DrawerLightBrown.PrimaryPart:FindFirstChildOfClass("BodyPosition"):Destroy()
 					end
-					
+
 					local BodyPosition2 = Instance.new("BodyPosition")
 					BodyPosition2.Position = GeneratePosition(Torso,55)
 					BodyPosition2.P = 20000
 					BodyPosition2.Parent = DrawerLightBrown.PrimaryPart
 					BodyPosition2.MaxForce = Vector3.new(5000000,5000000,5000000)
-					
+
 					HRP.CFrame = DrawerLightBrown.PrimaryPart.CFrame
 					HRP.AssemblyLinearVelocity = Vector3.new(0,0,0)
 					wait(0.05)
@@ -346,14 +423,14 @@ do
 					wait(0.05)
 					SetNetworkOwnerRemote:FireServer(DrawerLightBrown:FindFirstChild("Part"),DrawerLightBrown.PrimaryPart.CFrame)
 					wait(0.05)
-					
+
 				end
 			end
 			HRP.CFrame = OriginalCframe
 			HRP.AssemblyLinearVelocity = Vector3.new(0,0,0)
-			
+
 			wait(Options.Time.Value)
-			
+
 			for _, DrawerLightBrown in ipairs(workspace:GetDescendants()) do
 				if DrawerLightBrown:IsA("Model") and DrawerLightBrown.Name == "DrawerLightBrown" and DrawerLightBrown.PrimaryPart then
 					if DrawerLightBrown.PrimaryPart:FindFirstChildOfClass("BodyPosition") then
@@ -361,7 +438,7 @@ do
 					end
 				end
 			end
-			
+
 			wait(1)
 			HRP.CFrame = HumanoidRootPart.CFrame
 			HRP.AssemblyLinearVelocity = Vector3.new(0,0,0)
@@ -375,7 +452,7 @@ do
 			bodyForce.Force = direction * 9999999
 			bodyForce.Parent = HumanoidRootPart
 			game:GetService("Debris"):AddItem(bodyForce, 1)
-			
+
 			for _, Missile in ipairs(workspace:GetDescendants()) do
 				if Missile:IsA("Model") and Missile.Name == "BombMissile" and Missile.PrimaryPart then
 					HRP.CFrame = CFrame.new(Vector3.new(Missile.PrimaryPart.Position.X,Missile.PrimaryPart.Position.Y+5,Missile.PrimaryPart.Position.Z))
@@ -391,7 +468,7 @@ do
 					BodyPosition2.MaxForce = Vector3.new(5000000,5000000,5000000)
 				end
 			end
-			
+
 			for _, DrawerLightBrown in ipairs(workspace:GetDescendants()) do
 				if DrawerLightBrown:IsA("Model") and DrawerLightBrown.Name == "DrawerLightBrown" and DrawerLightBrown.PrimaryPart then
 					if DrawerLightBrown.PrimaryPart:FindFirstChildOfClass("BodyPosition") then
@@ -404,7 +481,7 @@ do
 					end
 				end
 			end
-			
+
 			PreventEscape:Disconnect()
 			wait(.1)
 			--Humanoid.Health = 0
@@ -432,9 +509,9 @@ do
 			HRP.CFrame = HumanoidRootPart.CFrame
 			wait(0.1)
 			SetNetworkOwnerRemote:FireServer(Torso,Torso.CFrame)
-			
+
 			wait(1)
-			
+
 			workspace.CurrentCamera.CameraSubject = chr.Humanoid
 			wait(0.01)
 			HRP.AssemblyLinearVelocity = Vector3.new(0,0,0)
@@ -444,7 +521,7 @@ do
 			HRP.CFrame = OriginalCframe
 		end
 	end
-	
+
 end
 ----------------------------------------------------------------------------------------------------------
 ----------------------------------------------------------------------------------------------------------
@@ -457,8 +534,8 @@ local KeybindControlCharacter = Tabs.Troll:AddKeybind("KeybindControlCharacter",
 		if GrabParts then
 			local Item = GrabParts.GrabPart.WeldConstraint.Part1
 			if Item and Item.Parent:FindFirstChild("Humanoid") then
-				
-				
+
+
 			end
 		end
 	end
