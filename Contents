@@ -234,23 +234,76 @@ do
 	})
 
 
-	local QToActivate= Tabs.DirectionalPunch:AddToggle("QToActivate", {Title = "Q To Activate", Default = false })
+	local SuperSlam = Tabs.DirectionalPunch:AddToggle("SuperSlam", {Title = "Super Slam", Default = false })
+	local SuperThrowPunch = Tabs.DirectionalPunch:AddToggle("SuperThrowPunch", {Title = "Super Throw Punch", Default = false })
+
 
 	plr:GetMouse().KeyDown:Connect(function(key)
-		if key == "q" then
-			if Options.QToActivate.Value == true then
+		if key == "1" then
+			if Options.SuperSlam.Value == true then
 				FinalRipOff_Move()
+			end
+		end
+		if key == "2" then
+			if Options.SuperThrowPunch.Value == true then
+				local radius = 10
+				local region = Region3.new(
+					plr.Character:WaitForChild("HumanoidRootPart").Position - Vector3.new(radius, radius, radius),
+					plr.Character:WaitForChild("HumanoidRootPart").Position + Vector3.new(radius, radius, radius)
+				)
+
+				local parts = workspace:FindPartsInRegion3(region, nil, math.huge)
+				for _, Character in ipairs(parts) do
+					if Character.Parent:FindFirstChild("Humanoid") and Character.Parent.Name ~= plr.Name then
+						SuperThrowPunch(Character.Parent)
+						return 
+					end
+				end
 			end
 		end
 	end)
 
-	function FinalRipOff_Move()
+	function SuperThrowPunch(character)
+		local HumanoidRootPart = character:WaitForChild("HumanoidRootPart")
+		local Torso = character:WaitForChild("Torso")
+		
+		SetNetworkOwnerRemote:FireServer(Torso,Torso.CFrame)
+		wait(0.1)
+		SetNetworkOwnerRemote:FireServer(Torso,Torso.CFrame)
+		wait(0.1)
+		HumanoidRootPart.CFrame = plr.Character.HumanoidRootPart.CFrame * CFrame.new(Vector3.new(4,0,0))
+		SetNetworkOwnerRemote:FireServer(Torso,Torso.CFrame)
+		wait(0.1)
+		character.Humanoid.Health -= 10
+		HumanoidRootPart.CFrame = plr.Character.HumanoidRootPart.CFrame * CFrame.new(Vector3.new(4,0,0))
+		local humanoid = plr.Character:WaitForChild("Humanoid")
+	
+		local AnimationId = "218504594"
+		local Anim = Instance.new("Animation")
+		Anim.AnimationId = "rbxassetid://"..AnimationId
+		local Track = game.Players.LocalPlayer.Character.Humanoid:LoadAnimation(Anim)
+		
+		Track:Play()
+		HumanoidRootPart.CFrame = plr.Character.HumanoidRootPart.CFrame * CFrame.new(Vector3.new(4,0,0))
 
+		
+		local BodyForce = Instance.new("BodyForce")
+		BodyForce.Force = plr.Character.Torso.CFrame.LookVector * 9000
+		BodyForce.Parent = HumanoidRootPart
+		game:GetService("Debris"):AddItem(BodyForce, 0.1)
+
+
+	end
+
+	function FinalRipOff_Move()
+		local Ingore = {}
 		local params = RaycastParams.new()
 		params.FilterType = Enum.RaycastFilterType.Exclude
-		params.FilterDescendantsInstances = {plr.Character,plr.Character:FindFirstChild("Head"),workspace.CurrentCamera}
+		params.FilterDescendantsInstances = {Ingore,workspace.CurrentCamera}
 		local ray = workspace:Raycast(workspace.CurrentCamera.CFrame.Position,workspace.CurrentCamera.CFrame.LookVector*50,params)
-
+		if ray and ray.Instance.Parent.Name == plr.Name then
+			table.insert(Ingore,ray.Instance)
+		end
 		if ray and ray.Instance and ray.Instance.Parent and ray.Instance.Parent:FindFirstChild("Humanoid") and ray.Instance.Parent.Name ~= plr.Name then
 			print(ray.Instance.Name)
 			local Character = ray.Instance.Parent
@@ -272,36 +325,49 @@ do
 			wait(0.05)
 			SetNetworkOwnerRemote:FireServer(Torso,Torso.CFrame)
 			wait(0.1)
-			
+
 			local BodyPosition = Instance.new("BodyPosition")
-			BodyPosition.P = 200000000
-			BodyPosition.MaxForce = Vector3.new(999999999,999999999,999999999)
+			BodyPosition.P = 200000
+			BodyPosition.MaxForce = Vector3.new(99999,99999,99999)
 			BodyPosition.Position = StartingPoint
 			BodyPosition.Parent = Torso
-			
+
 			local BodyPosition2 = Instance.new("BodyPosition")
 			BodyPosition2.P = 200000
 			BodyPosition2.MaxForce = Vector3.new(99999,99999,99999)
 			BodyPosition2.Position = StartingPoint
 			BodyPosition2.Parent = HRP
-			
+
+			local AnimationId = "184574340"
+			local Anim = Instance.new("Animation")
+			Anim.AnimationId = "rbxassetid://"..AnimationId
+			local hitler = game.Players.LocalPlayer.Character.Humanoid:LoadAnimation(Anim)
+
+			hitler:Play()
+			hitler:AdjustSpeed(0.4)
+
 			wait(.5)
 			BodyPosition.Position = MiddlePoint
 			BodyPosition2.Position = MiddlePoint + Vector3.new(0,8,0)
 			wait(1)
-			BodyPosition.Position = LastPoint
-			BodyPosition2.Position = LastPoint
-			wait(1)
-			BodyPosition2:Destroy()
-			BodyPosition:Destroy()
-			
+
 			for _, SmallDice in ipairs(workspace:GetDescendants()) do
 				if SmallDice.Name == "DiceSmall" and SmallDice:IsA("Model") then
-					SmallDice.PrimaryPart.CFrame = Torso.CFrame
+					SmallDice.PrimaryPart.CFrame = CFrame.new(LastPoint)
 				end
 			end
-			Character.Humanoid.Health -= 50
 
+			BodyPosition.Position = LastPoint
+			BodyPosition2.Position = LastPoint
+			wait(.5)
+			BodyPosition2:Destroy()
+			BodyPosition:Destroy()
+			Character.Humanoid.Health -= 50
+			local bodyForce = Instance.new("BodyForce")
+			local direction = (StartingPoint - LastPoint).unit
+			bodyForce.Force = direction * 5000
+			bodyForce.Parent = Torso
+			game:GetService("Debris"):AddItem(bodyForce, 0.1)
 		end
 	end
 
